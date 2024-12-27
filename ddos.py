@@ -374,19 +374,20 @@ headers1 = {
 }
 
 
+#--------------------------------
+
 def http_method():
     for i in range(x):
         global headers1
         url = targ
         response = requests.get(url, headers=headers1)
+        print(f"Status Code 'GET': {response.status_code}")
 
-        print(f"Status Code: {response.status_code}")
-        print(f"Response Body: {response.text}")
 
 if method == 4:
     for _ in range(threads): # Start x amount of threads
 
-        t = threading.Thread(target=http_method, daemon=True) #sets the thread target to the function "icmp_method", daemon means we can exit the thread before its finished its done
+        t = threading.Thread(target=http_method, daemon=True) #sets the thread target to the function "http_method", daemon means we can exit the thread before its finished its done
 
         t.start() # starts the thread and function
 
